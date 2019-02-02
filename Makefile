@@ -46,7 +46,7 @@ OBJPROG = $(addprefix $(OBJDIR)/,$(PROG))
 
 # Default target
 .PHONY: all
-all: make_dirs $(OBJPROG)
+all: $(OBJPROG)
 
 # Automatic dependency generation to include header files
 # Include the .d files only if the target is not clean
@@ -78,9 +78,8 @@ clean:
 
 # Create output directory if not exists
 # Mirror src subdirectory structure in build
-.PHONY: make_dirs
-make_dirs:
-	@mkdir -p $(OBJDIR)
-	@cd $(SRCDIR)
-	@find . -type d -exec mkdir -p ../$(OBJDIR)/{} \;
-	@cd ..
+$(shell mkdir -p $(OBJDIR))
+$(shell cd $(SRCDIR) \
+	find . -type d -exec mkdir -p ../$(OBJDIR)/{} \; \
+	cd .. \
+)
