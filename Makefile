@@ -8,6 +8,20 @@
 #  http://nuclear.mutantstargoat.com/articles/make/#automatic-include-dependency-tracking
 #  
 
+# Program name
+PROG = hello-make
+
+# Source files list
+SRCS := main.cpp
+SRCS += yeah.cpp
+SRCS += ohyeah/ohyeah.cpp
+
+# Include directories
+INCDIRS := src
+INCDIRS += src/ohyeah
+
+
+
 # Append CROSS_COMPILE variable to support cross toolchains
 AR = $(CROSS_COMPILE)ar
 CC = $(CROSS_COMPILE)gcc
@@ -15,16 +29,11 @@ CXX = $(CROSS_COMPILE)g++
 PREPROCESS.c ?= $(CC) -E $(CFLAGS)
 PREPROCESS.cc ?= $(CXX) -E $(CFLAGS)
 
-# Program name
-PROG = hello-make
-
-# Source files list
-SRCS += main.cpp
-SRCS += yeah.cpp
-
 # Create objects and dependencies list from sources list
+# Expand include directories
 OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 DEPS = $(patsubst %.o,%.d,$(OBJS))
+INCS = $(addprefix -I,$(INCDIRS))
 
 # Directory defintions
 OBJDIR = build
@@ -34,9 +43,10 @@ SRCDIR = src
 OBJPROG = $(addprefix $(OBJDIR)/,$(PROG))
 
 
+
 # Default target
 .PHONY: all
-all: $(OBJPROG)
+all: make_dirs $(OBJPROG)
 
 # Automatic dependency generation to include header files
 # Include the .d files only if the target is not clean
@@ -47,17 +57,17 @@ endif
 
 # Rules to generate dependency files (.d)
 $(OBJDIR)/%.d: $(SRCDIR)/%.cpp
-	$(PREPROCESS.cc) $< -MM -MT $(@:.d=.o) >$@
+	$(PREPROCESS.cc) $(INCS) $< -MM -MT $(@:.d=.o) > $@
 
 $(OBJDIR)/%.d: $(SRCDIR)/%.c
-	$(PREPROCESS.c) $< -MM -MT $(@:.d=.o) >$@
+	$(PREPROCESS.c) $(INCS) $< -MM -MT $(@:.d=.o) > $@
 
 # Compile and link
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(COMPILE.cc) $< -o $@
+	$(COMPILE.cc) $(INCS) $< -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(COMPILE.c) $< -o $@
+	$(COMPILE.c) $(INCS) $< -o $@
 
 $(OBJPROG): $(OBJS)
 	$(LINK.o) $^ $(LDLIBS) -o $@
@@ -67,4 +77,10 @@ clean:
 	$(RM) $(OBJPROG) $(OBJS) $(DEPS)
 
 # Create output directory if not exists
-$(shell mkdir -p $(OBJDIR))
+# Mirror src subdirectory structure in build
+.PHONY: make_dirs
+make_dirs:
+	@mkdir -p $(OBJDIR)
+	@cd $(SRCDIR)
+	@find . -type d -exec mkdir -p ../$(OBJDIR)/{} \;
+	@cd ..
