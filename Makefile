@@ -23,15 +23,15 @@ SRCS += main.cpp
 SRCS += yeah.cpp
 
 # Create objects and dependencies list from sources list
-OBJS = $(patsubst %.cpp, %.o, $(patsubst %.c, %.o, $(SRCS)))
-DEPS = $(patsubst %.o, %.d, $(OBJS))
+OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
+DEPS = $(patsubst %.o,%.d,$(OBJS))
 
 # Directory defintions
 OBJDIR = build
 SRCDIR = src
 
 # Expand directory name for the object files
-OBJPROG = $(addprefix $(OBJDIR)/, $(PROG))
+OBJPROG = $(addprefix $(OBJDIR)/,$(PROG))
 
 
 # Default target
@@ -42,7 +42,7 @@ all: $(OBJPROG)
 # Include the .d files only if the target is not clean
 # "-" suppresses warning on the first run when .d files not exist yet
 ifneq ($(MAKECMDGOALS), clean)
--include $(addprefix $(OBJDIR)/, $(DEPS))
+-include $(DEPS)
 endif
 
 # Rules to generate dependency files (.d)
@@ -59,12 +59,12 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(COMPILE.c) $< -o $@
 
-$(OBJPROG): $(addprefix $(OBJDIR)/, $(OBJS))
+$(OBJPROG): $(OBJS)
 	$(LINK.o) $^ $(LDLIBS) -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(OBJDIR)/*
+	$(RM) $(OBJPROG) $(OBJS) $(DEPS)
 
 # Create output directory if not exists
 $(shell mkdir -p $(OBJDIR))
