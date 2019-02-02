@@ -79,7 +79,7 @@ clean:
 # Create output directory if not exists
 # Mirror src subdirectory structure in build
 $(shell mkdir -p $(OBJDIR))
-$(shell cd $(SRCDIR) \
-	find . -type d -exec mkdir -p ../$(OBJDIR)/{} \; \
+$(shell cd $(SRCDIR) && \
+	find . -type d -exec mkdir -p ../$(OBJDIR)/{} \; && \
 	cd .. \
 )
