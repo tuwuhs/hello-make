@@ -20,6 +20,9 @@ SRCS += ohyeah/ohyeah.cpp
 INCDIRS := .
 INCDIRS += ohyeah
 
+# Additional libraries
+LIBS :=
+LIBS += m
 
 
 # Append CROSS_COMPILE variable to support cross toolchains
@@ -34,10 +37,12 @@ OBJDIR = build
 SRCDIR = src
 
 # Create objects and dependencies list from sources list
-# Expand include directories
+# Expand include directories and prepend -I
+# Prepend -l to additional libraries
 OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 DEPS = $(patsubst %.o,%.d,$(OBJS))
 INCS = $(addprefix -I$(SRCDIR)/,$(INCDIRS))
+LDLIBS += $(addprefix -l,$(LIBS))
 
 # Expand directory name for the object files
 OBJPROG = $(addprefix $(OBJDIR)/,$(PROG))
