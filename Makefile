@@ -17,8 +17,8 @@ SRCS += yeah.cpp
 SRCS += ohyeah/ohyeah.cpp
 
 # Include directories
-INCDIRS := src
-INCDIRS += src/ohyeah
+INCDIRS := .
+INCDIRS += ohyeah
 
 
 
@@ -29,15 +29,15 @@ CXX = $(CROSS_COMPILE)g++
 PREPROCESS.c ?= $(CC) -E $(CFLAGS)
 PREPROCESS.cc ?= $(CXX) -E $(CFLAGS)
 
+# Directory defintions
+OBJDIR = build
+SRCDIR = src
+
 # Create objects and dependencies list from sources list
 # Expand include directories
 OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$(SRCS))))
 DEPS = $(patsubst %.o,%.d,$(OBJS))
-INCS = $(addprefix -I,$(INCDIRS))
-
-# Directory defintions
-OBJDIR = build
-SRCDIR = src
+INCS = $(addprefix -I$(SRCDIR)/,$(INCDIRS))
 
 # Expand directory name for the object files
 OBJPROG = $(addprefix $(OBJDIR)/,$(PROG))
