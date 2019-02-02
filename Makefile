@@ -1,7 +1,10 @@
 # A simple Makefile
 # Tuwuh Sarwoprasojo (2019)
 #
-# Inspired by http://make.mad-scientist.net/papers/how-not-to-use-vpath/
+# Inspired by:
+#  http://make.mad-scientist.net/papers/how-not-to-use-vpath/
+#  https://www.math.colostate.edu/~yzhou/computer/writemakefile.html
+#  http://polaris.s.kanazawa-u.ac.jp/~npozar/intro-to-make.html
 #
 
 # Append CROSS_COMPILE variable to support cross toolchains
@@ -12,9 +15,12 @@ CXX = $(CROSS_COMPILE)g++
 # Program name
 PROG = hello-make
 
-# Object files list
-OBJS += main.o
-OBJS += yeah.o
+# Source files list
+SRCS += main.cpp
+SRCS += yeah.cpp
+
+# Create object files list from source files list
+OBJS = $(patsubst %.cpp, %.o, $(patsubst %.c, %.o, $(SRCS)))
 
 # Directory defintions
 OBJDIR = build
